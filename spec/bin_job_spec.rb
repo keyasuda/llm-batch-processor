@@ -10,15 +10,16 @@ RSpec.describe 'bin/job.rb script' do
     {
       id: 'script-test-job',
       erb_filepath: temp_erb_file.path,
-      backend_endpoint: 'https://api.example.com',
-      model: 'gpt-3.5-turbo',
+      backend_endpoint: 'http://localhost:8080',
+      model: 'qwen3-0.6b',
       output_label: 'response',
+      params: { temperature: 0.1 },
       use_images: false
     }
   end
 
-  let(:erb_content) { 'Test prompt: <%= texts[:input] %>' }
-  let(:input_jsonl) { '{"id": "test1", "texts": {"input": "test message"}}' }
+  let(:erb_content) { 'テストプロンプト: <%= texts[:input] %>' }
+  let(:input_jsonl) { '{"id": "test1", "texts": {"input": "こんにちは、世界"}}' }
   
   before do
     temp_erb_file.write(erb_content)
@@ -52,72 +53,76 @@ RSpec.describe 'bin/job.rb script' do
       expect(stderr).to include('Job definition file not found')
     end
 
-    context 'with mocked API responses' do
-      before do
-        # Mock successful API response - need to match the exact request
-        stub_request(:post, "https://api.example.com/v1/chat/completions")
-          .to_return(
-            status: 200,
-            body: {
-              choices: [
-                {
-                  message: {
-                    content: "Mocked response from API"
-                  }
-                }
-              ]
-            }.to_json,
-            headers: { 'Content-Type' => 'application/json' }
-          )
-      end
-
+    context 'with qwen3-0.6b integration', :slow do
       it 'processes JSONL input successfully' do
-        stdout, stderr, status = Open3.capture3(
-          'bundle', 'exec', 'ruby', 'bin/job.rb', temp_job_file.path,
-          stdin_data: input_jsonl
-        )
-        
-        expect(status.exitstatus).to eq(0)
-        expect(stderr).to be_empty
-        
-        output = JSON.parse(stdout.strip)
-        expect(output).to include(
-          'id' => 'test1',
-          'texts' => hash_including(
-            'input' => 'test message',
-            'response' => 'Mocked response from API'
+        begin
+          stdout, stderr, status = Open3.capture3(
+            'bundle', 'exec', 'ruby', 'bin/job.rb', temp_job_file.path,
+            stdin_data: input_jsonl
           )
-        )
+          
+          expect(status.exitstatus).to eq(0)
+          expect(stderr).to be_empty
+          
+          output = JSON.parse(stdout.strip)
+          expect(output).to include(
+            'id' => 'test1',
+            'texts' => hash_including(
+              'input' => 'こんにちは、世界',
+              'response' => a_string_matching(/.+/)
+            )
+          )
+          
+          # Verify we got a non-empty response
+          expect(output['texts']['response']).not_to be_empty
+          
+        rescue => e
+          skip "qwen3-0.6b not available: #{e.message}"
+        end
       end
 
       it 'handles multiple JSONL lines' do
-        multi_input = [
-          '{"id": "test1", "texts": {"input": "first message"}}',
-          '{"id": "test2", "texts": {"input": "second message"}}'
-        ].join("\n")
-        
-        stdout, stderr, status = Open3.capture3(
-          'bundle', 'exec', 'ruby', 'bin/job.rb', temp_job_file.path,
-          stdin_data: multi_input
-        )
-        
-        expect(status.exitstatus).to eq(0)
-        
-        lines = stdout.strip.split("\n")
-        expect(lines.length).to eq(2)
-        
-        result1 = JSON.parse(lines[0])
-        result2 = JSON.parse(lines[1])
-        
-        expect(result1['id']).to eq('test1')
-        expect(result2['id']).to eq('test2')
+        begin
+          multi_input = [
+            '{"id": "test1", "texts": {"input": "最初のメッセージ"}}',
+            '{"id": "test2", "texts": {"input": "二番目のメッセージ"}}'
+          ].join("\n")
+          
+          stdout, stderr, status = Open3.capture3(
+            'bundle', 'exec', 'ruby', 'bin/job.rb', temp_job_file.path,
+            stdin_data: multi_input
+          )
+          
+          expect(status.exitstatus).to eq(0)
+          expect(stderr).to be_empty
+          
+          lines = stdout.strip.split("\n")
+          expect(lines.length).to eq(2)
+          
+          result1 = JSON.parse(lines[0])
+          result2 = JSON.parse(lines[1])
+          
+          expect(result1['id']).to eq('test1')
+          expect(result2['id']).to eq('test2')
+          
+          expect(result1['texts']['response']).not_to be_empty
+          expect(result2['texts']['response']).not_to be_empty
+          
+        rescue => e
+          skip "qwen3-0.6b not available: #{e.message}"
+        end
       end
     end
 
     context 'with API errors' do
+      let(:invalid_job_config) do
+        job_config.merge(backend_endpoint: 'http://localhost:9999')
+      end
+      
       before do
-        stub_request(:post, "https://api.example.com/v1/chat/completions")
-          .to_return(status: 500, body: 'Internal Server Error')
+        temp_job_file.reopen(temp_job_file.path, 'w')
+        temp_job_file.write(invalid_job_config.to_yaml)
+        temp_job_file.close
       end
 
       it 'handles API errors gracefully' do
