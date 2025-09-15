@@ -1,0 +1,12 @@
+---
+# 画像処理ジョブ定義の例
+:id: image-analysis-job
+:erb_filepath: docs/example/image_prompt.erb
+:system_erb_filepath: docs/example/image_system.erb
+:backend_endpoint: http://localhost:8080
+:model: karakuri-vl-instruct
+:params:
+  :temperature: 0.1
+  :max_tokens: 300
+:use_images: true
+:output_label: description
