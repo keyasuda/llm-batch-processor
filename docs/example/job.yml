@@ -1,7 +1,8 @@
 ---
 # ジョブ定義YAMLファイルの例
 :id: ジョブの識別子
-:erb_filepath: プロンプト定義ファイル(ERB)のパス
+:erb_filepath: ユーザープロンプト定義ファイル(ERB)のパス
+:system_erb_filepath: システムプロンプト定義ファイル(ERB)のパス(オプション)
 :backend_endpoint: バックエンドのエンドポイントURL(OAI互換API)
 :model: 使用するモデル名
 :params: モデル呼び出し時に与えるパラメータ(e.g. temperature)

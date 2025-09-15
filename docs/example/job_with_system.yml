@@ -1,0 +1,12 @@
+---
+# システムプロンプト付きジョブ定義の例
+:id: summarization-with-system
+:erb_filepath: docs/example/user_prompt.erb
+:system_erb_filepath: docs/example/system_prompt.erb
+:backend_endpoint: http://localhost:8080
+:model: qwen3-0.6b
+:params:
+  :temperature: 0.3
+  :max_tokens: 200
+:use_images: false
+:output_label: summary

@@ -31,11 +31,12 @@ class JobProcessor
   end
 
   def process_item(input_data)
-    # Generate prompt using ERB template
-    prompt = generate_prompt(input_data)
+    # Generate prompts using ERB templates
+    user_prompt = generate_prompt(input_data)
+    system_prompt = generate_system_prompt(input_data)
     
     # Call LLM API
-    llm_response = call_llm_api(prompt, input_data)
+    llm_response = call_llm_api(user_prompt, input_data, system_prompt)
     
     # Build result
     result = {
@@ -74,6 +75,13 @@ class JobProcessor
     unless File.exist?(@job_config[:erb_filepath])
       raise "ERB template file not found: #{@job_config[:erb_filepath]}"
     end
+
+    # Validate system prompt ERB file if specified
+    if @job_config[:system_erb_filepath]
+      unless File.exist?(@job_config[:system_erb_filepath])
+        raise "System ERB template file not found: #{@job_config[:system_erb_filepath]}"
+      end
+    end
   end
 
   def generate_prompt(input_data)
@@ -87,16 +95,41 @@ class JobProcessor
     erb.result(binding)
   end
 
-  def call_llm_api(prompt, input_data)
+  def generate_system_prompt(input_data)
+    return nil unless @job_config[:system_erb_filepath]
+    
+    erb_content = File.read(@job_config[:system_erb_filepath])
+    erb = ERB.new(erb_content)
+    
+    # Make input_data available in ERB context
+    texts = input_data[:texts] || {}
+    images = input_data[:images] || []
+    
+    erb.result(binding)
+  end
+
+  def call_llm_api(user_prompt, input_data, system_prompt = nil)
+    # Build messages array
+    messages = []
+    
+    # Add system message if system prompt is provided
+    if system_prompt && !system_prompt.strip.empty?
+      messages << {
+        role: "system",
+        content: system_prompt
+      }
+    end
+    
+    # Add user message
+    messages << {
+      role: "user",
+      content: build_message_content(user_prompt, input_data)
+    }
+    
     # Build request parameters
     parameters = {
       model: @job_config[:model],
-      messages: [
-        {
-          role: "user",
-          content: build_message_content(prompt, input_data)
-        }
-      ]
+      messages: messages
     }
     
     # Add optional parameters if specified
