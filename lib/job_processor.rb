@@ -141,9 +141,17 @@ class JobProcessor
     response = @client.chat(parameters: parameters)
     
     # Extract content from response
-    response.dig("choices", 0, "message", "content") || ""
+    raw_content = response.dig("choices", 0, "message", "content") || ""
+    
+    # Remove reasoning tags if present
+    clean_content(raw_content)
   rescue => e
     raise "API request failed: #{e.message}"
+  end
+
+  def clean_content(content)
+    # Remove <think>...</think> tags and their content
+    content.gsub(/<think>.*?<\/think>/m, '').strip
   end
 
   def build_message_content(prompt, input_data)
