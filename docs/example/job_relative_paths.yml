@@ -1,0 +1,12 @@
+---
+# 相対パス使用のジョブ定義例
+:id: relative-path-summary-job
+:erb_filepath: templates/summary_user.erb      # 相対パス
+:system_erb_filepath: templates/summary_system.erb  # 相対パス
+:backend_endpoint: http://localhost:8080
+:model: qwen3-0.6b
+:params:
+  :temperature: 0.3
+  :max_tokens: 150
+:use_images: false
+:output_label: summary

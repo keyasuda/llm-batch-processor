@@ -7,6 +7,7 @@ LLM は OpenAI API 互換の API を使用します。
 
 - **ERB テンプレート**: ユーザープロンプトとシステムプロンプトを ERB で柔軟に定義
 - **システムプロンプト対応**: 別ファイルでシステムプロンプトを設定可能
+- **相対パス対応**: ERBファイルをYAMLファイルからの相対パスで指定可能
 - **JSONL 処理**: 標準入力からの JSONL データを一行ずつ処理
 - **OpenAI API 互換**: 各種 LLM バックエンドに対応
 - **推論タグ除去**: LLM応答から `<think>...</think>` タグを自動除去
@@ -58,3 +59,19 @@ bundle exec ruby bin/job.rb docs/example/job_with_system.yml < docs/example/inpu
 :use_images: false
 :output_label: summary
 ```
+
+### 相対パス対応
+```yaml
+---
+:id: relative-path-job
+:erb_filepath: templates/user_prompt.erb      # 相対パス
+:system_erb_filepath: templates/system.erb   # 相対パス
+:backend_endpoint: http://localhost:8080
+:model: qwen3-0.6b
+:output_label: response
+```
+
+ERBファイルパスは以下のように解決されます：
+- **絶対パス**: そのまま使用
+- **相対パス**: YAMLファイルの位置からの相対パスとして解決
+- **親ディレクトリ参照**: `../templates/prompt.erb` のような記述も対応

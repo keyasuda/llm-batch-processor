@@ -6,6 +6,7 @@ require 'erb'
 
 class JobProcessor
   def initialize(job_definition_path)
+    @job_definition_path = job_definition_path
     @job_config = YAML.load_file(job_definition_path, symbolize_names: true)
     validate_config!
     setup_openai_client
@@ -72,20 +73,36 @@ class JobProcessor
       raise "Missing required configuration keys: #{missing_keys.join(', ')}"
     end
 
-    unless File.exist?(@job_config[:erb_filepath])
-      raise "ERB template file not found: #{@job_config[:erb_filepath]}"
+    # Check ERB file path (resolve relative to YAML file)
+    erb_path = resolve_erb_path(@job_config[:erb_filepath])
+    unless File.exist?(erb_path)
+      raise "ERB template file not found: #{erb_path}"
     end
 
     # Validate system prompt ERB file if specified
     if @job_config[:system_erb_filepath]
-      unless File.exist?(@job_config[:system_erb_filepath])
-        raise "System ERB template file not found: #{@job_config[:system_erb_filepath]}"
+      system_erb_path = resolve_erb_path(@job_config[:system_erb_filepath])
+      unless File.exist?(system_erb_path)
+        raise "System ERB template file not found: #{system_erb_path}"
       end
     end
   end
 
+  def resolve_erb_path(erb_filepath)
+    # If path is absolute, use as-is
+    return erb_filepath if File.absolute_path?(erb_filepath)
+    
+    # If path is relative, resolve relative to the job definition YAML file
+    job_dir = File.dirname(@job_definition_path)
+    resolved_path = File.join(job_dir, erb_filepath)
+    
+    # Normalize the path to handle parent directory references (..)
+    File.expand_path(resolved_path)
+  end
+
   def generate_prompt(input_data)
-    erb_content = File.read(@job_config[:erb_filepath])
+    erb_path = resolve_erb_path(@job_config[:erb_filepath])
+    erb_content = File.read(erb_path)
     erb = ERB.new(erb_content)
     
     # Make input_data available in ERB context
@@ -98,7 +115,8 @@ class JobProcessor
   def generate_system_prompt(input_data)
     return nil unless @job_config[:system_erb_filepath]
     
-    erb_content = File.read(@job_config[:system_erb_filepath])
+    system_erb_path = resolve_erb_path(@job_config[:system_erb_filepath])
+    erb_content = File.read(system_erb_path)
     erb = ERB.new(erb_content)
     
     # Make input_data available in ERB context
