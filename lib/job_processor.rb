@@ -86,6 +86,14 @@ class JobProcessor
         raise "System ERB template file not found: #{system_erb_path}"
       end
     end
+
+    # Validate JSON schema file if specified
+    if @job_config[:json_schema_filepath]
+      json_schema_path = resolve_erb_path(@job_config[:json_schema_filepath])
+      unless File.exist?(json_schema_path)
+        raise "JSON schema file not found: #{json_schema_path}"
+      end
+    end
   end
 
   def resolve_erb_path(erb_filepath)
@@ -155,6 +163,9 @@ class JobProcessor
       parameters.merge!(@job_config[:params])
     end
     
+    # Add JSON mode and schema if specified
+    add_json_response_format!(parameters)
+    
     # Make API call using ruby-openai gem
     response = @client.chat(parameters: parameters)
     
@@ -165,6 +176,32 @@ class JobProcessor
     clean_content(raw_content)
   rescue => e
     raise "API request failed: #{e.message}"
+  end
+
+  def add_json_response_format!(parameters)
+    return unless @job_config[:json_mode] || @job_config[:json_schema_filepath] || @job_config[:json_schema]
+    
+    if @job_config[:json_schema]
+      # Inline schema in job YAML
+      parameters[:response_format] = {
+        type: "json_object",
+        schema: @job_config[:json_schema]
+      }
+    elsif @job_config[:json_schema_filepath]
+      # Schema from external file
+      schema_path = resolve_erb_path(@job_config[:json_schema_filepath])
+      schema_yaml = YAML.load_file(schema_path, symbolize_names: true)
+      
+      parameters[:response_format] = {
+        type: "json_object",
+        schema: schema_yaml
+      }
+    elsif @job_config[:json_mode]
+      # Simple JSON mode
+      parameters[:response_format] = {
+        type: "json_object"
+      }
+    end
   end
 
   def clean_content(content)

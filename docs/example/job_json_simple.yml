@@ -1,0 +1,13 @@
+---
+# シンプルなJSONモードの例
+:id: json-simple-mode
+:erb_filepath: templates/json_user.erb
+:system_erb_filepath: templates/json_system.erb
+:backend_endpoint: http://localhost:8080
+:model: qwen3-0.6b
+:json_mode: true  # シンプルJSONモード有効
+:params:
+  :temperature: 0.1
+  :max_tokens: 300
+:use_images: false
+:output_label: json_response

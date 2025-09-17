@@ -1,0 +1,13 @@
+---
+# 人物情報抽出の例
+:id: person-extraction
+:erb_filepath: templates/person_extraction.erb
+:system_erb_filepath: templates/json_system.erb
+:json_schema_filepath: schemas/person_schema.yml
+:backend_endpoint: http://localhost:8080
+:model: qwen3-0.6b
+:params:
+  :temperature: 0.0  # 正確性重視
+  :max_tokens: 500
+:use_images: false
+:output_label: person_info

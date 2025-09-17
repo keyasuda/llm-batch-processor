@@ -1,0 +1,13 @@
+---
+# スキーマ制約付きJSONモードの例
+:id: json-schema-mode
+:erb_filepath: templates/json_user.erb
+:system_erb_filepath: templates/json_system.erb
+:json_schema_filepath: schemas/summary_schema.yml  # スキーマファイル指定
+:backend_endpoint: http://localhost:8080
+:model: qwen3-0.6b
+:params:
+  :temperature: 0.1
+  :max_tokens: 400
+:use_images: false
+:output_label: structured_data

@@ -1,0 +1,50 @@
+---
+# 人物情報抽出（インラインスキーマ）
+:id: person-extraction-inline
+:erb_filepath: templates/person_extraction.erb
+:system_erb_filepath: templates/json_system.erb
+:backend_endpoint: http://localhost:8080
+:model: qwen3-0.6b
+:params:
+  :temperature: 0.0
+  :max_tokens: 500
+:use_images: false
+:output_label: person_info
+:json_schema:
+  type: object
+  properties:
+    name:
+      type: string
+      description: "Person's full name"
+    age:
+      type: integer
+      minimum: 0
+      maximum: 150
+      description: "Person's age in years"
+    occupation:
+      type: string
+      description: "Person's job or profession"
+    skills:
+      type: array
+      items:
+        type: string
+      description: "List of skills or abilities"
+    location:
+      type: object
+      properties:
+        city:
+          type: string
+        country:
+          type: string
+      description: "Person's location information"
+    contact:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+      description: "Contact information"
+  required:
+    - name

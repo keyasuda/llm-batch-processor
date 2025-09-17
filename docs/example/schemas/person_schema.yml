@@ -1,0 +1,34 @@
+---
+type: object
+properties:
+  name:
+    type: string
+    description: "Person's full name"
+  age:
+    type: integer
+    minimum: 0
+    maximum: 150
+    description: "Person's age in years"
+  occupation:
+    type: string
+    description: "Person's job or profession"
+  skills:
+    type: array
+    items:
+      type: string
+    description: "List of skills or abilities"
+  address:
+    type: object
+    properties:
+      street:
+        type: string
+      city:
+        type: string
+      country:
+        type: string
+    required:
+      - city
+      - country
+required:
+  - name
+  - age

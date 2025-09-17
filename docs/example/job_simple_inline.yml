@@ -1,0 +1,37 @@
+---
+# シンプルな構造化データ抽出
+:id: simple-structured-data
+:erb_filepath: templates/json_user.erb
+:system_erb_filepath: templates/json_system.erb
+:backend_endpoint: http://localhost:8080
+:model: qwen3-0.6b
+:params:
+  :temperature: 0.2
+  :max_tokens: 200
+:use_images: false
+:output_label: result
+:json_schema:
+  type: object
+  properties:
+    category:
+      type: string
+      description: "Main category of the content"
+    tags:
+      type: array
+      items:
+        type: string
+      maxItems: 3
+      description: "Relevant tags"
+    priority:
+      type: string
+      enum:
+        - high
+        - medium
+        - low
+      description: "Priority level"
+    status:
+      type: string
+      description: "Current status"
+  required:
+    - category
+    - priority

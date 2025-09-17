@@ -8,6 +8,7 @@ LLM は OpenAI API 互換の API を使用します。
 - **ERB テンプレート**: ユーザープロンプトとシステムプロンプトを ERB で柔軟に定義
 - **システムプロンプト対応**: 別ファイルでシステムプロンプトを設定可能
 - **相対パス対応**: ERBファイルをYAMLファイルからの相対パスで指定可能
+- **JSON モード対応**: 構造化データ抽出とスキーマ制約付きJSON出力
 - **JSONL 処理**: 標準入力からの JSONL データを一行ずつ処理
 - **OpenAI API 互換**: 各種 LLM バックエンドに対応
 - **推論タグ除去**: LLM応答から `<think>...</think>` タグを自動除去
@@ -75,3 +76,51 @@ ERBファイルパスは以下のように解決されます：
 - **絶対パス**: そのまま使用
 - **相対パス**: YAMLファイルの位置からの相対パスとして解決
 - **親ディレクトリ参照**: `../templates/prompt.erb` のような記述も対応
+
+### JSON モード対応
+```yaml
+---
+# シンプルJSONモード
+:id: simple-json-job
+:erb_filepath: templates/user_prompt.erb
+:json_mode: true                              # シンプルJSON出力
+:backend_endpoint: http://localhost:8080
+:model: qwen3-0.6b
+:output_label: json_data
+
+---
+# インラインスキーマ（推奨）
+:id: inline-schema-job
+:erb_filepath: templates/user_prompt.erb
+:backend_endpoint: http://localhost:8080
+:model: qwen3-0.6b
+:output_label: structured_data
+:json_schema:                                 # スキーマをYAML内に直接定義
+  type: object
+  properties:
+    name:
+      type: string
+      description: "Person's full name"
+    age:
+      type: integer
+      minimum: 0
+      maximum: 150
+    skills:
+      type: array
+      items:
+        type: string
+  required:
+    - name
+    - age
+
+---
+# 外部スキーマファイル
+:id: file-schema-job
+:erb_filepath: templates/user_prompt.erb
+:json_schema_filepath: schemas/person.yml     # 外部ファイル参照
+:backend_endpoint: http://localhost:8080
+:model: qwen3-0.6b
+:output_label: structured_data
+```
+
+優先順位: `json_schema` (インライン) > `json_schema_filepath` (ファイル) > `json_mode` (シンプル)
