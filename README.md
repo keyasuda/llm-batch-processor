@@ -7,11 +7,11 @@ LLM は OpenAI API 互換の API を使用します。
 
 - **ERB テンプレート**: ユーザープロンプトとシステムプロンプトを ERB で柔軟に定義
 - **システムプロンプト対応**: 別ファイルでシステムプロンプトを設定可能
-- **相対パス対応**: ERBファイルをYAMLファイルからの相対パスで指定可能
-- **JSON モード対応**: 構造化データ抽出とスキーマ制約付きJSON出力
+- **相対パス対応**: ERB ファイルを YAML ファイルからの相対パスで指定可能
+- **JSON モード対応**: 構造化データ抽出とスキーマ制約付き JSON 出力
 - **JSONL 処理**: 標準入力からの JSONL データを一行ずつ処理
 - **OpenAI API 互換**: 各種 LLM バックエンドに対応
-- **推論タグ除去**: LLM応答から `<think>...</think>` タグを自動除去
+- **推論タグ除去**: LLM 応答から `<think>...</think>` タグを自動除去
 - **画像処理対応**: マルチモーダルモデルでの画像+テキスト処理
 - **エラーハンドリング**: 堅牢なエラー処理とログ出力
 
@@ -35,9 +35,17 @@ bundle exec rspec
 bundle exec ruby bin/job.rb docs/example/job_with_system.yml < docs/example/input_sample.jsonl
 ```
 
+## 依存関係
+
+- Ruby 3.3+
+- ruby-openai ~> 8.3.0 (OpenAI API 互換クライアント)
+- YAML, JSON (標準ライブラリ)
+- ERB (標準ライブラリ)
+
 ## ジョブ定義ファイル
 
 ### 基本設定
+
 ```yaml
 ---
 :id: ジョブの識別子
@@ -48,11 +56,12 @@ bundle exec ruby bin/job.rb docs/example/job_with_system.yml < docs/example/inpu
 ```
 
 ### システムプロンプト対応
+
 ```yaml
 ---
 :id: summarization-job
 :erb_filepath: user_prompt.erb
-:system_erb_filepath: system_prompt.erb  # オプション
+:system_erb_filepath: system_prompt.erb # オプション
 :backend_endpoint: http://localhost:8080
 :model: qwen3-0.6b
 :params:
@@ -62,28 +71,31 @@ bundle exec ruby bin/job.rb docs/example/job_with_system.yml < docs/example/inpu
 ```
 
 ### 相対パス対応
+
 ```yaml
 ---
 :id: relative-path-job
-:erb_filepath: templates/user_prompt.erb      # 相対パス
-:system_erb_filepath: templates/system.erb   # 相対パス
+:erb_filepath: templates/user_prompt.erb # 相対パス
+:system_erb_filepath: templates/system.erb # 相対パス
 :backend_endpoint: http://localhost:8080
 :model: qwen3-0.6b
 :output_label: response
 ```
 
-ERBファイルパスは以下のように解決されます：
+ERB ファイルパスは以下のように解決されます：
+
 - **絶対パス**: そのまま使用
-- **相対パス**: YAMLファイルの位置からの相対パスとして解決
+- **相対パス**: YAML ファイルの位置からの相対パスとして解決
 - **親ディレクトリ参照**: `../templates/prompt.erb` のような記述も対応
 
 ### JSON モード対応
+
 ```yaml
 ---
 # シンプルJSONモード
 :id: simple-json-job
 :erb_filepath: templates/user_prompt.erb
-:json_mode: true                              # シンプルJSON出力
+:json_mode: true # シンプルJSON出力
 :backend_endpoint: http://localhost:8080
 :model: qwen3-0.6b
 :output_label: json_data
@@ -95,7 +107,7 @@ ERBファイルパスは以下のように解決されます：
 :backend_endpoint: http://localhost:8080
 :model: qwen3-0.6b
 :output_label: structured_data
-:json_schema:                                 # スキーマをYAML内に直接定義
+:json_schema: # スキーマをYAML内に直接定義
   type: object
   properties:
     name:
@@ -117,7 +129,7 @@ ERBファイルパスは以下のように解決されます：
 # 外部スキーマファイル
 :id: file-schema-job
 :erb_filepath: templates/user_prompt.erb
-:json_schema_filepath: schemas/person.yml     # 外部ファイル参照
+:json_schema_filepath: schemas/person.yml # 外部ファイル参照
 :backend_endpoint: http://localhost:8080
 :model: qwen3-0.6b
 :output_label: structured_data

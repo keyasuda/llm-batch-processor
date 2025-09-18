@@ -39,7 +39,7 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
     rspec-support (3.13.5)
-    ruby-openai (6.5.0)
+    ruby-openai (8.3.0)
       event_stream_parser (>= 0.3.0, < 2.0.0)
       faraday (>= 1)
       faraday-multipart (>= 1)
@@ -56,7 +56,7 @@ PLATFORMS
 DEPENDENCIES
   base64
   rspec (~> 3.12)
-  ruby-openai (~> 6.3)
+  ruby-openai (~> 8.3.0)
   webmock (~> 3.18)
 
 BUNDLED WITH

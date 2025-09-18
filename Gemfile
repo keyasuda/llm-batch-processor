@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'ruby-openai', '~> 6.3'
+gem 'ruby-openai', '~> 8.3.0'
 gem 'base64'
 
 group :test do
