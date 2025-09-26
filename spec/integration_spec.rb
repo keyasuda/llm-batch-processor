@@ -9,7 +9,7 @@ RSpec.describe 'JobProcessor Integration', :integration do
     {
       id: 'integration-test-job',
       erb_filepath: temp_erb_file.path,
-      backend_endpoint: 'http://localhost:8080',
+      backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
       model: 'qwen3-0.6b',
       output_label: 'summary',
       params: { temperature: 0.1 },

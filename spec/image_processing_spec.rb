@@ -16,7 +16,7 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
       id: 'image-analysis-job',
       erb_filepath: temp_user_erb_file.path,
       system_erb_filepath: temp_system_erb_file.path,
-      backend_endpoint: 'http://localhost:8080',
+      backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
       model: 'karakuri-vl-instruct',
       output_label: 'description',
       params: { temperature: 0.1 },

@@ -42,7 +42,7 @@ RSpec.describe 'JSON Mode Support' do
         {
           id: 'simple-json-test',
           erb_filepath: 'templates/user.erb',
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
           model: 'test-model',
           json_mode: true,
           output_label: 'response',
@@ -74,7 +74,7 @@ RSpec.describe 'JSON Mode Support' do
           id: 'schema-json-test',
           erb_filepath: 'templates/user.erb',
           json_schema_filepath: 'schemas/test_schema.yml',
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
           model: 'test-model',
           output_label: 'response',
           use_images: false
@@ -114,7 +114,7 @@ RSpec.describe 'JSON Mode Support' do
           id: 'missing-schema-test',
           erb_filepath: 'templates/user.erb',
           json_schema_filepath: 'schemas/nonexistent.yml',
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
           model: 'test-model',
           output_label: 'response',
           use_images: false
@@ -142,7 +142,7 @@ RSpec.describe 'JSON Mode Support' do
         {
           id: 'normal-test',
           erb_filepath: 'templates/user.erb',
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
           model: 'test-model',
           output_label: 'response',
           use_images: false
@@ -181,7 +181,7 @@ RSpec.describe 'JSON Mode Support' do
           id: 'inline-schema-test',
           erb_filepath: 'templates/user.erb',
           json_schema: inline_schema,
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
           model: 'test-model',
           output_label: 'response',
           use_images: false
@@ -214,7 +214,7 @@ RSpec.describe 'JSON Mode Support' do
           erb_filepath: 'templates/user.erb',
           json_mode: true,
           json_schema_filepath: 'schemas/test_schema.yml',
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
           model: 'test-model',
           output_label: 'response',
           use_images: false
@@ -252,7 +252,7 @@ RSpec.describe 'JSON Mode Support' do
           json_mode: true,
           json_schema_filepath: 'schemas/test_schema.yml',
           json_schema: inline_schema,
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
           model: 'test-model',
           output_label: 'response',
           use_images: false
@@ -296,7 +296,7 @@ RSpec.describe 'JSON Mode Support' do
         id: 'integration-test',
         erb_filepath: 'templates/user.erb',
         json_schema_filepath: 'schemas/person.yml',
-        backend_endpoint: 'http://localhost:8080',
+        backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
         model: 'test-model',
         output_label: 'person_data',
         use_images: false
@@ -415,7 +415,7 @@ RSpec.describe 'JSON Mode Support' do
         id: 'complex-schema-test',
         erb_filepath: 'templates/user.erb',
         json_schema_filepath: 'schemas/complex.yml',
-        backend_endpoint: 'http://localhost:8080',
+        backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
         model: 'test-model',
         output_label: 'analysis',
         use_images: false
