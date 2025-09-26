@@ -34,5 +34,6 @@ jobs:
 
       - name: Run tests
         run: bundle exec rspec
+        timeout-minutes: 30
         env:
           LLM_API_ENDPOINT: ${{ secrets.LLM_API_ENDPOINT }}
