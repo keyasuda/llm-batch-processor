@@ -19,6 +19,11 @@ allowed_hosts << tailscale_host if tailscale_host
 
 WebMock.disable_net_connect!(allow_localhost: true, allow: allowed_hosts)
 
+# Helper method for consistent backend endpoint configuration
+def test_backend_endpoint
+  ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080'
+end
+
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true

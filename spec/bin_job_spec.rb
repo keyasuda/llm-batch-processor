@@ -10,7 +10,7 @@ RSpec.describe 'bin/job.rb script' do
     {
       id: 'script-test-job',
       erb_filepath: temp_erb_file.path,
-      backend_endpoint: ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080',
+      backend_endpoint: test_backend_endpoint,
       model: 'qwen3-0.6b',
       output_label: 'response',
       params: { temperature: 0.1 },
