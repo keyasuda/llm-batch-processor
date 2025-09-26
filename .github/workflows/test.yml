@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    # Limit GITHUB_TOKEN permissions to read-only access for security
+    permissions:
+      contents: read
     environment:
       name: CI
 
