@@ -6,8 +6,23 @@ require 'yaml'
 require 'erb'
 require 'tempfile'
 
-# Disable HTTP connections except for localhost (for qwen3-0.6b tests)
-WebMock.disable_net_connect!(allow_localhost: true, allow: ['localhost', '127.0.0.1'])
+# Disable HTTP connections except for localhost and Tailscale network (for qwen3-0.6b tests)
+# Extract Tailscale host from LLM_API_ENDPOINT if set
+tailscale_host = nil
+if ENV['LLM_API_ENDPOINT']
+  uri = URI.parse(ENV['LLM_API_ENDPOINT'])
+  tailscale_host = uri.host if uri.host&.match?(/^100\./)
+end
+
+allowed_hosts = ['localhost', '127.0.0.1']
+allowed_hosts << tailscale_host if tailscale_host
+
+WebMock.disable_net_connect!(allow_localhost: true, allow: allowed_hosts)
+
+# Helper method for consistent backend endpoint configuration
+def test_backend_endpoint
+  ENV['LLM_API_ENDPOINT'] || 'http://localhost:8080'
+end
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

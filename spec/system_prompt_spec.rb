@@ -14,7 +14,7 @@ RSpec.describe 'System Prompt Feature' do
       id: 'system-prompt-test',
       erb_filepath: temp_user_erb_file.path,
       system_erb_filepath: temp_system_erb_file.path,
-      backend_endpoint: 'http://localhost:8080',
+      backend_endpoint: test_backend_endpoint,
       model: 'qwen3-0.6b',
       output_label: 'response',
       params: { temperature: 0.1 },
@@ -26,7 +26,7 @@ RSpec.describe 'System Prompt Feature' do
     {
       id: 'no-system-prompt-test',
       erb_filepath: temp_user_erb_file.path,
-      backend_endpoint: 'http://localhost:8080',
+      backend_endpoint: test_backend_endpoint,
       model: 'qwen3-0.6b',
       output_label: 'response',
       params: { temperature: 0.1 },

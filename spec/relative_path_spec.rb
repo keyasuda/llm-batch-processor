@@ -24,7 +24,7 @@ RSpec.describe 'Relative Path Support' do
         id: 'relative-path-test',
         erb_filepath: 'templates/user_prompt.erb',           # Relative path
         system_erb_filepath: 'templates/system_prompt.erb',  # Relative path
-        backend_endpoint: 'http://localhost:8080',
+        backend_endpoint: test_backend_endpoint,
         model: 'test-model',
         output_label: 'response',
         use_images: false
@@ -75,7 +75,7 @@ RSpec.describe 'Relative Path Support' do
           id: 'absolute-path-test',
           erb_filepath: user_erb_path,        # Absolute path
           system_erb_filepath: system_erb_path, # Absolute path
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: test_backend_endpoint,
           model: 'test-model',
           output_label: 'response',
           use_images: false
@@ -106,7 +106,7 @@ RSpec.describe 'Relative Path Support' do
           id: 'mixed-path-test',
           erb_filepath: 'templates/user_prompt.erb',  # Relative
           system_erb_filepath: system_erb_path,        # Absolute
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: test_backend_endpoint,
           model: 'test-model',
           output_label: 'response',
           use_images: false
@@ -148,7 +148,7 @@ RSpec.describe 'Relative Path Support' do
           id: 'nested-path-test',
           erb_filepath: 'templates/prompts/user.erb',
           system_erb_filepath: 'templates/prompts/system.erb',
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: test_backend_endpoint,
           model: 'test-model',
           output_label: 'response',
           use_images: false
@@ -188,7 +188,7 @@ RSpec.describe 'Relative Path Support' do
         {
           id: 'missing-file-test',
           erb_filepath: 'templates/nonexistent.erb',
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: test_backend_endpoint,
           model: 'test-model',
           output_label: 'response',
           use_images: false
@@ -221,7 +221,7 @@ RSpec.describe 'Relative Path Support' do
         {
           id: 'parent-ref-test',
           erb_filepath: '../parent_prompt.erb',  # Parent directory reference
-          backend_endpoint: 'http://localhost:8080',
+          backend_endpoint: test_backend_endpoint,
           model: 'test-model',
           output_label: 'response',
           use_images: false
