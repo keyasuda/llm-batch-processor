@@ -3,7 +3,9 @@ require 'base64'
 require 'open3'
 require_relative '../lib/job_processor'
 
-RSpec.describe 'Image Processing with qwen2.5-vl-3b' do
+MODEL_NAME = 'qwen2.5-vl-3b'.freeze
+
+RSpec.describe "Image Processing with #{MODEL_NAME}" do
   let(:temp_user_erb_file) { Tempfile.new(['image_user_prompt', '.erb']) }
   let(:temp_system_erb_file) { Tempfile.new(['image_system_prompt', '.erb']) }
   let(:temp_job_file) { Tempfile.new(['image_job', '.yml']) }
@@ -17,7 +19,7 @@ RSpec.describe 'Image Processing with qwen2.5-vl-3b' do
       erb_filepath: temp_user_erb_file.path,
       system_erb_filepath: temp_system_erb_file.path,
       backend_endpoint: test_backend_endpoint,
-      model: 'qwen2.5-vl-3b',
+      model: MODEL_NAME,
       output_label: 'description',
       params: { temperature: 0.1 },
       use_images: true
@@ -87,10 +89,10 @@ RSpec.describe 'Image Processing with qwen2.5-vl-3b' do
     end
   end
 
-  describe 'qwen2.5-vl-3b integration', :slow do
+  describe "#{MODEL_NAME} integration", :slow do
     let(:processor) { JobProcessor.new(temp_job_file.path) }
 
-    context 'when qwen2.5-vl-3b is available' do
+    context "when #{MODEL_NAME} is available" do
       it 'processes apple image successfully' do
         begin
           result = processor.process_item(input_data_with_image)
@@ -112,7 +114,7 @@ RSpec.describe 'Image Processing with qwen2.5-vl-3b' do
           expect(description.downcase).to match(/apple|りんご|red|赤/)
 
         rescue => e
-          skip "qwen2.5-vl-3b not available: #{e.message}"
+          skip "#{MODEL_NAME} not available: #{e.message}"
         end
       end
 
@@ -130,7 +132,7 @@ RSpec.describe 'Image Processing with qwen2.5-vl-3b' do
           expect(has_descriptive_word).to be true
 
         rescue => e
-          skip "qwen2.5-vl-3b not available: #{e.message}"
+          skip "#{MODEL_NAME} not available: #{e.message}"
         end
       end
     end
@@ -155,7 +157,7 @@ RSpec.describe 'Image Processing with qwen2.5-vl-3b' do
           expect(description.length).to be > 30
 
         rescue => e
-          skip "qwen2.5-vl-3b not available: #{e.message}"
+          skip "#{MODEL_NAME} not available: #{e.message}"
         end
       end
     end
@@ -179,7 +181,7 @@ RSpec.describe 'Image Processing with qwen2.5-vl-3b' do
           expect(result[:texts][:description]).not_to be_empty
 
         rescue => e
-          skip "qwen2.5-vl-3b not available: #{e.message}"
+          skip "#{MODEL_NAME} not available: #{e.message}"
         end
       end
     end
@@ -203,7 +205,7 @@ RSpec.describe 'Image Processing with qwen2.5-vl-3b' do
           expect { processor.process_item(input_data_invalid_image) }.to raise_error(/API request failed/)
 
         rescue => e
-          skip "qwen2.5-vl-3b not available: #{e.message}"
+          skip "#{MODEL_NAME} not available: #{e.message}"
         end
       end
     end
@@ -226,7 +228,7 @@ RSpec.describe 'Image Processing with qwen2.5-vl-3b' do
           expect(result[:texts][:description]).not_to be_empty
 
         rescue => e
-          skip "qwen2.5-vl-3b not available: #{e.message}"
+          skip "#{MODEL_NAME} not available: #{e.message}"
         end
       end
     end
@@ -268,7 +270,7 @@ RSpec.describe 'Image Processing with qwen2.5-vl-3b' do
         expect(output['texts']['description']).not_to be_empty
 
       rescue => e
-        skip "qwen2.5-vl-3b not available: #{e.message}"
+        skip "#{MODEL_NAME} not available: #{e.message}"
       end
     end
   end
