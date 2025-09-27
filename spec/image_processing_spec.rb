@@ -3,7 +3,7 @@ require 'base64'
 require 'open3'
 require_relative '../lib/job_processor'
 
-RSpec.describe 'Image Processing with karakuri-vl-instruct' do
+RSpec.describe 'Image Processing with qwen2.5-vl-3b' do
   let(:temp_user_erb_file) { Tempfile.new(['image_user_prompt', '.erb']) }
   let(:temp_system_erb_file) { Tempfile.new(['image_system_prompt', '.erb']) }
   let(:temp_job_file) { Tempfile.new(['image_job', '.yml']) }
@@ -17,7 +17,7 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
       erb_filepath: temp_user_erb_file.path,
       system_erb_filepath: temp_system_erb_file.path,
       backend_endpoint: test_backend_endpoint,
-      model: 'karakuri-vl-instruct',
+      model: 'qwen2.5-vl-3b',
       output_label: 'description',
       params: { temperature: 0.1 },
       use_images: true
@@ -71,15 +71,15 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
     it 'builds multi-modal message content correctly' do
       # Test the private method to ensure correct message structure
       message_content = processor.send(:build_message_content, user_erb_content, input_data_with_image)
-      
+
       expect(message_content).to be_an(Array)
       expect(message_content.length).to be >= 2
-      
+
       # Should have text content
       text_part = message_content.find { |part| part[:type] == "text" }
       expect(text_part).not_to be_nil
       expect(text_part[:text]).to eq(user_erb_content)
-      
+
       # Should have image content
       image_part = message_content.find { |part| part[:type] == "image_url" }
       expect(image_part).not_to be_nil
@@ -87,14 +87,14 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
     end
   end
 
-  describe 'karakuri-vl-instruct integration', :slow do
+  describe 'qwen2.5-vl-3b integration', :slow do
     let(:processor) { JobProcessor.new(temp_job_file.path) }
 
-    context 'when karakuri-vl-instruct is available' do
+    context 'when qwen2.5-vl-3b is available' do
       it 'processes apple image successfully' do
         begin
           result = processor.process_item(input_data_with_image)
-          
+
           expect(result).to include(
             id: 'apple-image-test',
             texts: hash_including(
@@ -102,17 +102,17 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
             ),
             images: [apple_image_base64]
           )
-          
+
           # Verify we got a meaningful response
           description = result[:texts][:description]
           expect(description).not_to be_empty
           expect(description.length).to be > 10
-          
+
           # The response should mention apple/りんご or red/赤
           expect(description.downcase).to match(/apple|りんご|red|赤/)
-          
+
         rescue => e
-          skip "karakuri-vl-instruct not available: #{e.message}"
+          skip "qwen2.5-vl-3b not available: #{e.message}"
         end
       end
 
@@ -120,17 +120,17 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
         begin
           result = processor.process_item(input_data_with_image)
           description = result[:texts][:description]
-          
+
           # Should be a substantial description
           expect(description.length).to be > 50
-          
+
           # Should contain descriptive words
           descriptive_words = %w[画像 リンゴ 赤 apple red image]
           has_descriptive_word = descriptive_words.any? { |word| description.include?(word) }
           expect(has_descriptive_word).to be true
-          
+
         rescue => e
-          skip "karakuri-vl-instruct not available: #{e.message}"
+          skip "qwen2.5-vl-3b not available: #{e.message}"
         end
       end
     end
@@ -148,14 +148,14 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
         begin
           result = processor.process_item(input_data_with_image)
           description = result[:texts][:description]
-          
+
           expect(description).not_to be_empty
-          
+
           # Detailed prompt should generate longer response
           expect(description.length).to be > 30
-          
+
         rescue => e
-          skip "karakuri-vl-instruct not available: #{e.message}"
+          skip "qwen2.5-vl-3b not available: #{e.message}"
         end
       end
     end
@@ -175,11 +175,11 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
         begin
           processor_no_sys = JobProcessor.new(temp_job_file.path)
           result = processor_no_sys.process_item(input_data_with_image)
-          
+
           expect(result[:texts][:description]).not_to be_empty
-          
+
         rescue => e
-          skip "karakuri-vl-instruct not available: #{e.message}"
+          skip "qwen2.5-vl-3b not available: #{e.message}"
         end
       end
     end
@@ -198,12 +198,12 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
       it 'handles invalid image gracefully' do
         begin
           processor = JobProcessor.new(temp_job_file.path)
-          
+
           # Invalid image data should cause an API error, which is expected
           expect { processor.process_item(input_data_invalid_image) }.to raise_error(/API request failed/)
-          
+
         rescue => e
-          skip "karakuri-vl-instruct not available: #{e.message}"
+          skip "qwen2.5-vl-3b not available: #{e.message}"
         end
       end
     end
@@ -221,12 +221,12 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
         begin
           processor = JobProcessor.new(temp_job_file.path)
           result = processor.process_item(input_data_no_image)
-          
+
           # Should still process, but with text-only content
           expect(result[:texts][:description]).not_to be_empty
-          
+
         rescue => e
-          skip "karakuri-vl-instruct not available: #{e.message}"
+          skip "qwen2.5-vl-3b not available: #{e.message}"
         end
       end
     end
@@ -251,10 +251,10 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
           'bundle', 'exec', 'ruby', 'bin/job.rb', temp_job_file.path,
           stdin_data: jsonl_content
         )
-        
+
         expect(status.exitstatus).to eq(0)
         expect(stderr).to be_empty
-        
+
         output = JSON.parse(stdout.strip)
         expect(output).to include(
           'id' => 'apple-image-test',
@@ -263,12 +263,12 @@ RSpec.describe 'Image Processing with karakuri-vl-instruct' do
           ),
           'images' => [apple_image_base64]
         )
-        
+
         # Verify meaningful description
         expect(output['texts']['description']).not_to be_empty
-        
+
       rescue => e
-        skip "karakuri-vl-instruct not available: #{e.message}"
+        skip "qwen2.5-vl-3b not available: #{e.message}"
       end
     end
   end
