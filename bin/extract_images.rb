@@ -64,25 +64,19 @@ end
 
 def determine_image_format(image_data)
   # Check magic bytes to determine image format
-  if image_data.start_with?("\x89PNG\r\n\x1a\n".force_encoding('BINARY'))
+  case
+  when image_data.start_with?("\x89PNG\r\n\x1a\n".force_encoding('BINARY'))
     'png'
-  elsif image_data.start_with?("\xff\xd8\xff".force_encoding('BINARY'))
+  when image_data.start_with?("\xff\xd8\xff".force_encoding('BINARY'))
     'jpg'
-  elsif image_data.start_with?('GIF8'.force_encoding('BINARY'))
+  when image_data.start_with?('GIF87a'.force_encoding('BINARY')), image_data.start_with?('GIF89a'.force_encoding('BINARY'))
     'gif'
-  elsif image_data.start_with?("\x00\x00\x00\x0cJFIF".force_encoding('BINARY')) ||
-       image_data.start_with?("\x00\x00\x00\x0cExif".force_encoding('BINARY'))
-    'jpg'
-  elsif image_data[0, 2] == "\x42\x4D".force_encoding('BINARY')
+  when image_data.start_with?('BM'.force_encoding('BINARY'))
     'bmp'
-  elsif image_data.start_with?("\x49\x49\x2A\x00".force_encoding('BINARY')) ||
+  when image_data.start_with?("\x49\x49\x2A\x00".force_encoding('BINARY')),
        image_data.start_with?("\x4D\x4D\x00\x2A".force_encoding('BINARY'))
     'tiff'
-  elsif image_data.start_with?("\x47\x49\x46\x38\x37\x61".force_encoding('BINARY')) ||
-       image_data.start_with?("\x47\x49\x46\x38\x39\x61".force_encoding('BINARY'))
-    'gif'
-  elsif image_data[0, 4] == "\x52\x49\x46\x46".force_encoding('BINARY') && 
-       image_data[8, 4] == "\x57\x45\x42\x50".force_encoding('BINARY')
+  when image_data.start_with?('RIFF'.force_encoding('BINARY')) && image_data[8, 4] == 'WEBP'.force_encoding('BINARY')
     'webp'
   else
     # Return nil if format cannot be determined (not a valid image)

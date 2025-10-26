@@ -3,6 +3,7 @@ require 'tmpdir'
 require 'fileutils'
 require 'json'
 require 'base64'
+require 'open3'
 
 RSpec.describe 'Image Extraction Script' do
   let(:script_path) { File.join(File.dirname(__FILE__), '../bin/extract_images.rb') }
@@ -248,8 +249,8 @@ RSpec.describe 'Image Extraction Script' do
 
   it 'shows error message with no arguments' do
     # Test the script with no arguments
-    expect do
-      system('bundle', 'exec', 'ruby', script_path)
-    end
+    output, status = Open3.capture2e('bundle', 'exec', 'ruby', script_path)
+    expect(status.success?).to be false
+    expect(output).to include("Usage:")
   end
 end
