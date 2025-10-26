@@ -42,6 +42,31 @@ bundle exec ruby bin/job.rb docs/example/job_with_system.yml < docs/example/inpu
 - YAML, JSON (標準ライブラリ)
 - ERB (標準ライブラリ)
 
+## 画像抽出ツール
+
+LLMバッチプロセッサは、base64エンコードされた画像データを含むJSONLファイルを処理できます。これらの画像を人間が確認するために、JSONLファイルから画像を抽出して指定ディレクトリに保存するツールを追加しました。
+
+### 画像抽出スクリプトの使用方法
+
+JSONLファイルから画像を抽出するには、以下のように実行します：
+
+```bash
+bundle exec ruby bin/extract_images.rb <input.jsonl> <output_directory>
+```
+
+例：
+
+```bash
+bundle exec ruby bin/extract_images.rb docs/example/sample_with_images.jsonl extracted_images/
+```
+
+スクリプトの動作：
+- 出力ディレクトリが存在しない場合は作成
+- JSONLファイルからbase64エンコードされた画像をすべて抽出
+- マジックバイトに基づいて画像フォーマットを判別
+- 各画像を「line_{行番号}_image_{インデックス}.{フォーマット}」の形式で保存
+- 抽出進捗を表示
+
 ## ジョブ定義ファイル
 
 ### 基本設定
