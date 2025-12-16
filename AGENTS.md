@@ -67,7 +67,7 @@ The system is designed to be used in Unix-like pipelines. A common pattern is:
 2. **Processor**: `bin/job.rb`
 3. **Filter**: `jq` to parse and extract specific results
 
-Agents should prefer this composable approach over creating monolithic scripts. When processing LLM output with `jq`, remember to key into the output field (e.g., `texts.result`) and often use `fromjson` if the model returns a JSON string.
+Agents should prefer this composable approach over creating monolithic scripts. When processing LLM output with `jq`, remember to key into the output field (e.g., `texts.result`, where `result` corresponds to the `:output_label` in the job YAML) and often use `fromjson` if the model returns a JSON string.
 
 
 ```yaml
