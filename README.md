@@ -41,6 +41,32 @@ bundle exec ruby bin/job.rb docs/example/job_with_system.yml < docs/example/inpu
 - ruby-openai ~> 8.3.0 (OpenAI API 互換クライアント)
 - YAML, JSON (標準ライブラリ)
 - ERB (標準ライブラリ)
+- jq (オプション: 出力フィルタリング用)
+
+## 高度な利用方法: パイプラインアーキテクチャ
+
+本ツールは、Unixパイプラインの一部として組み込むことを想定しています。
+「データ生成(Generator) | 処理(Processor) | 抽出(Filter)」のパターンで、大規模なデータを効率的に処理できます。
+
+### パイプライン構成例
+
+1.  **Generator**: 対象データを検索し、JSONL形式で標準出力に出力するスクリプト (例: 画像検索、DBダンプ)
+2.  **Processor**: `bin/job.rb` (本ツール)
+3.  **Filter**: `jq` 等を使用して、必要なデータのみを後続処理に渡す
+
+### 実行例: 画像検索パイプライン
+
+ディレクトリ内の画像を列挙し、VLMで条件判定を行い、合致するファイルパスのみを抽出する例：
+
+```bash
+# 1. 画像を列挙してJSONL化 | 2. VLMで判定 | 3. 合致するもの(match=true)のIDを抽出
+bundle exec ruby images_to_jsonl.rb /path/to/images "猫が写っている" | \
+bundle exec ruby bin/job.rb job.yml | \
+jq -r 'select((.texts.result | fromjson | .match) == true) | .id'
+```
+
+> **Note**
+> LLMの出力がJSON文字列として返される場合（多くのケースでそうなります）、`jq` で `fromjson` フィルタを使用してオブジェクトにパースしてからフィールドにアクセスする必要があります。
 
 ## 画像抽出ツール
 
